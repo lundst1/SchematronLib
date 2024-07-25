@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,8 +9,13 @@ using System.Xml.Linq;
 
 namespace SchematronLib
 {
+    /// <summary>
+    /// Class for the schematron file.
+    /// Parses the file and loads rules into memory.
+    /// </summary>
     public class SchematronFile : XMLFile
     {
+        //Private variable for list of rules
         private List<Rule> ruleList = new List<Rule>();
         public List<Rule> RuleList
         {
@@ -22,7 +28,7 @@ namespace SchematronLib
 
         private void Parse()
         {
-            var ruleElements = from r in Elements.Element(NameSpace + "pattern").Elements(NameSpace + "rule") select r;
+            var ruleElements = from r in Elements.Root.Element(NameSpace + "pattern").Elements(NameSpace + "rule") select r;
             
             foreach (var r in ruleElements) 
             {
@@ -34,12 +40,12 @@ namespace SchematronLib
 
                 foreach (XElement assert in asserts)
                 {
-                    rule.Asserts.Add(new RuleDefinition { Test = assert.Attribute("test").Value, Message=assert.Value }) ;
+                    rule.Asserts.Add(new RuleContent { TestString = assert.Attribute("test").Value, Message=assert.Value }) ;
                 }
 
                 foreach (XElement report in reports)
                 {
-                    rule.Reports.Add(new RuleDefinition { Test = report.Attribute("test").Value, Message = report.Value });
+                    rule.Reports.Add(new RuleContent { TestString = report.Attribute("test").Value, Message = report.Value });
                 }
 
                 ruleList.Add(rule);

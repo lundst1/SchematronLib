@@ -7,11 +7,15 @@ namespace SchematronLib
     {
         //Private string variable for the file name.
         private string filename;
-        //Private string variable for the namespace
+        //Private variable for the XML files namespace.
         private XNamespace nameSpace;
         //Private variable for loading all elements into memory.
-        private XElement elements;
-        
+        private XDocument elements;
+        //Private bool variable for if the XML file is well formed
+        private bool wellFormed = true;
+        //Private nullable bool for if the XML file is valid according to some schema.
+        private bool? valid;
+
         public string Filename
         {
             get { return filename; }
@@ -21,9 +25,14 @@ namespace SchematronLib
         {
             get { return nameSpace; }
         }
-        public XElement Elements
+        public XDocument Elements
         {
             get { return elements; }
+        }
+        public bool? Valid
+        {
+            get { return valid;  }
+            set { valid = value; }
         }
         public XMLFile(string filename)
         {
@@ -34,13 +43,11 @@ namespace SchematronLib
         }
         private void ReadFile()
         {
-            elements = XElement.Load(filename);
+            elements = XDocument.Load(filename);
         }
         private void SetNameSpace()
         {
-            nameSpace = elements.GetDefaultNamespace();
+            nameSpace = elements.Root.GetDefaultNamespace();
         }
-        //Todo: Antingen returnerar du listan så får Processor iterera över den
-        // Eller så publicerar du en händelse som processor lyssnar på och jämför regler med. 
     }
 }

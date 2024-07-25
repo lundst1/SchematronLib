@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SchematronLib
 {
@@ -12,9 +13,9 @@ namespace SchematronLib
         //Private string variable for  element context.
         private string context;
         //Private list variable for asserts.
-        private List<RuleDefinition> asserts = new List<RuleDefinition>();
+        private List<RuleContent> asserts = new List<RuleContent>();
         //Private list variable for reports.
-        private List<RuleDefinition> reports = new List<RuleDefinition>();
+        private List<RuleContent> reports = new List<RuleContent>();
         public string Context
         {
             get { return context; }
@@ -23,7 +24,7 @@ namespace SchematronLib
         /// Public property for variable asserts.
         /// Both read and write access.
         /// </summary>
-        public List<RuleDefinition> Asserts
+        public List<RuleContent> Asserts
         {
             get { return asserts; }
             set { asserts = value; }
@@ -32,15 +33,15 @@ namespace SchematronLib
         /// Public property for variable reports.
         /// Both read and write access.
         /// </summary>
-        public List<RuleDefinition> Reports
+        public List<RuleContent> Reports
         {
             get { return reports; }
             set { reports = value; }
         }
+
         public Rule(string context)
         {
             this.context = context;
         }
-
     }
 }
