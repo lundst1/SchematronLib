@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /SchematronLibTests/ProcessorTests.cs
 /SchematronLibTests/XML/car.sch
 /SchematronLibTests/XML/car.xml
+/SchematronLibTests/XML/car_fail.xml
