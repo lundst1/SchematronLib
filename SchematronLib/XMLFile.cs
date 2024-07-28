@@ -13,9 +13,7 @@ namespace SchematronLib
         private XDocument elements;
         //Private bool variable for if the XML file is well formed
         private bool wellFormed = true;
-        //Private nullable bool for if the XML file is valid according to some schema.
-        private bool? valid;
-
+       
         public string Filename
         {
             get { return filename; }
@@ -29,11 +27,7 @@ namespace SchematronLib
         {
             get { return elements; }
         }
-        public bool? Valid
-        {
-            get { return valid;  }
-            set { valid = value; }
-        }
+       
         public XMLFile(string filename)
         {
             this.filename = filename;

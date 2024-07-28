@@ -11,7 +11,7 @@ namespace SchematronLib
     public class Rule
     {
         //Private string variable for  element context.
-        private string context;
+        private string context; 
         //Private list variable for asserts.
         private List<RuleContent> asserts = new List<RuleContent>();
         //Private list variable for reports.
