@@ -17,11 +17,19 @@ namespace SchematronLib
     {
         //Private variable for list of rules
         private List<Rule> ruleList = new List<Rule>();
+        /// <summary>
+        /// Property to access variable ruleList.
+        /// Read access. 
+        /// </summary>
         public List<Rule> RuleList
         {
             get { return ruleList; }
         }
         public SchematronFile(string filename) : base(filename) 
+        {
+            Parse();
+        }
+        public SchematronFile(XDocument document) : base(document)
         {
             Parse();
         }

@@ -14,7 +14,7 @@ namespace SchematronLib
         //Private variable for XML file.
         private Document document;
         //Private variable for the Schematron file.
-        private SchematronFile schemaTronFile;
+        private SchematronFile schematronFile;
         /// <summary>
         /// Public property for variable xmlFile.
         /// Read access.
@@ -29,7 +29,7 @@ namespace SchematronLib
         /// </summary>
         public SchematronFile SchemaTronFile
         {
-            get { return schemaTronFile; }
+            get { return schematronFile; }
         }
         /// <summary>
         /// Constructor for processor class.
@@ -39,12 +39,22 @@ namespace SchematronLib
         public Processor(string document, string schematronFile)
         {
             this.document = new Document(document);
-            this.schemaTronFile = new SchematronFile(schematronFile);
+            this.schematronFile = new SchematronFile(schematronFile);
+        }
+        public Processor(Document document, SchematronFile schematronFile)
+        {
+            this.document = document;
+            this.schematronFile = schematronFile;
+        }
+        public Processor(XDocument document, XDocument schematronFile)
+        {
+            this.document = new Document(document);
+            this.schematronFile = new SchematronFile(schematronFile);
         }
         public void Process()
         {
             XDocument elements = document.Elements;
-            List<Rule> rules = schemaTronFile.RuleList;
+            List<Rule> rules = schematronFile.RuleList;
 
             document.Valid = true;
 
@@ -86,50 +96,6 @@ namespace SchematronLib
                     }
                 }
             } 
-
-            /*foreach (var el in elements.Descendants())
-            {
-                string name = el.Name.ToString();
-
-                foreach (Rule rule in rules)
-                {
-                    //TODO: Context är ett Xpath-uttryck och behöver hanteras så. Ta bort jämförandeoperator på rad 61 och använd xpathutvärdering. 
-                    string context = rule.Context;
-                    List<RuleContent> asserts = rule.Asserts;
-                    List<RuleContent> reports = rule.Reports;
-
-                    
-
-
-                    if (name == context)
-                    {
-                        foreach(RuleContent assert in asserts)
-                        {
-                            bool assertValid = assert.Test(el);
-                            
-                            if (assertValid)
-                            {
-                                Console.WriteLine("Assert successfull");
-                            }
-                            else
-                            {
-                                Console.WriteLine(assert.Message);
-                                document.Valid = false;
-                            }
-
-                        }
-                        foreach (RuleContent report in reports)
-                        {
-                            bool reportResult = report.Test(el);
-
-                            if (!reportResult)
-                            {
-                                Console.WriteLine(report.Message);
-                            }
-                        }
-                    }
-                }
-            }*/
         }
     }
 }

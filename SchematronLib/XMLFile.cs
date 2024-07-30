@@ -35,6 +35,11 @@ namespace SchematronLib
             SetNameSpace();
 
         }
+        public XMLFile(XDocument elements)
+        {
+            this.elements = elements;
+            SetNameSpace();
+        }
         private void ReadFile()
         {
             elements = XDocument.Load(filename);
