@@ -81,8 +81,12 @@ namespace SchematronLib
                         else
                         {
                             Console.WriteLine(assert.Message);
+                            
+                            document.Messages.Add(assert.Message);
                             document.Valid = false;
                         }
+
+
 
                     }
                     foreach (RuleContent report in reports)
