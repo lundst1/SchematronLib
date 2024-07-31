@@ -368,3 +368,6 @@ FodyWeavers.xsd
 /SchematronLibTests/XML/car_fail.xml
 /SchematronLibTests/XML/car_nestedRule.sch
 /SchematronLibTests/XML/car_nestedRule.xml
+/SchematronLibTests/XML/car_attribute.sch
+/SchematronLibTests/XML/car_attribute.xml
+/SchematronLibTests/XML/car_variable.sch
