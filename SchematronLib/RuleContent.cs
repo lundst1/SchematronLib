@@ -13,6 +13,7 @@ namespace SchematronLib
     /// </summary>
     public class RuleContent
     {
+        private Utilities utils = new Utilities();
         public string TestString { get; set; }
         public string Message { get; set; }
     
@@ -24,7 +25,7 @@ namespace SchematronLib
 
             
 
-            if (IsEmpty(value))
+            if (utils.XpathResultIsEmpty(value))
             {
                 result = false; 
             }
@@ -32,28 +33,5 @@ namespace SchematronLib
             return result;
 
         }
-
-        private bool IsEmpty(object value)
-        {
-            if (value == null)
-            {
-                return true;
-            }
-
-            switch (value)
-            {
-                case IEnumerable<object> enumerableResult:
-                    return !enumerableResult.Any();
-                case string strResult:
-                    return string.IsNullOrEmpty(strResult);
-                case bool boolResult:
-                    return !boolResult;
-                case double doubleResult:
-                    return double.IsNaN(doubleResult);
-                default:
-                    return false;
-            }
-        }
-
     }
 }
