@@ -22,6 +22,8 @@ namespace SchematronLib
 
             var value = System.Xml.XPath.Extensions.XPathEvaluate(node, TestString);
 
+            
+
             if (IsEmpty(value))
             {
                 result = false; 

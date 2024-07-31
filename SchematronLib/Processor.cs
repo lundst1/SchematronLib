@@ -61,7 +61,6 @@ namespace SchematronLib
             foreach (Rule rule in rules)
             {
                 string context = rule.Context;
-                Console.WriteLine(context);
                 List<RuleContent> asserts = rule.Asserts;
                 List<RuleContent> reports = rule.Reports;
 
@@ -69,9 +68,9 @@ namespace SchematronLib
             
                 foreach (XElement element in results) 
                 {
-                    Console.WriteLine(element.Name);
                     foreach (RuleContent assert in asserts)
                     {
+                        Console.WriteLine(assert.TestString);
                         bool assertValid = assert.Test(element);
 
                         if (assertValid)
@@ -85,9 +84,6 @@ namespace SchematronLib
                             document.Messages.Add(assert.Message);
                             document.Valid = false;
                         }
-
-
-
                     }
                     foreach (RuleContent report in reports)
                     {
@@ -96,6 +92,8 @@ namespace SchematronLib
                         if (!reportResult)
                         {
                             Console.WriteLine(report.Message);
+
+                            document.Messages.Add(report.Message);
                         }
                     }
                 }

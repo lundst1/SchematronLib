@@ -41,21 +41,12 @@ namespace SchematronLib
             foreach (var r in ruleElements) 
             {
                 string context = r.Attribute("context").Value.ToString();
-                Rule rule = new Rule(context);
-
+                
+                IEnumerable<XElement> variables = from variable in r.Elements(NameSpace + "let") select variable;
                 IEnumerable<XElement> asserts = from assert in r.Elements(NameSpace + "assert") select assert;
                 IEnumerable<XElement> reports = from report in r.Elements(NameSpace + "report") select report;
-
-                foreach (XElement assert in asserts)
-                {
-                    rule.Asserts.Add(new RuleContent { TestString = assert.Attribute("test").Value, Message=assert.Value }) ;
-                }
-
-                foreach (XElement report in reports)
-                {
-                    rule.Reports.Add(new RuleContent { TestString = report.Attribute("test").Value, Message = report.Value });
-                }
-
+                
+                Rule rule = new Rule(context, variables, asserts, reports);
                 ruleList.Add(rule);
             }
         }
