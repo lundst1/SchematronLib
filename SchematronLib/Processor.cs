@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using System.Xml.XPath;
 
 namespace SchematronLib
 {
@@ -67,8 +60,8 @@ namespace SchematronLib
                 List<RuleContent> reports = rule.Reports;
 
                 IEnumerable<object> results = (IEnumerable<object>)System.Xml.XPath.Extensions.XPathEvaluate(elements, context);
-            
-                foreach (XElement element in results) 
+
+                foreach (XElement element in results)
                 {
                     foreach (RuleContent assert in asserts)
                     {
@@ -82,7 +75,7 @@ namespace SchematronLib
                         else
                         {
                             string assertMessage = assert.Message;
-                            
+
                             assertMessage = HandleValueOf(assertMessage, element);
 
                             document.Messages.Add(assert.Message);
@@ -101,13 +94,13 @@ namespace SchematronLib
                         }
                     }
                 }
-            } 
+            }
         }
         private string HandleValueOf(string message, XElement node)
         {
             string newMessage = new string(message);
 
-            foreach (Match match in Regex.Matches(message, "[<][^>]+[>]"))
+            foreach (Match match in Regex.Matches(message, "[<][^>]+[>]")) // TODO: Det här regexet kommer plocka upp felaktiga taggar ex <abc>. Åtgärda
             {
                 string m = match.Value;
                 XElement valueOf = XElement.Parse(m);
