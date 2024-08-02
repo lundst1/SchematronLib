@@ -52,15 +52,18 @@ namespace SchematronLib
         /// <summary>
         /// Constructor for class Rule.
         /// Calls methods to build content based on children of element rule. 
+        /// Rule variables are read first so the in practice can overwrite  pattern variaables.
         /// </summary>
         /// <param name="context">The context of the rule. This is an Xpath statement.</param>
-        /// <param name="variables">Content of elements let.</param>
+        /// <param name="ruleVariables">Content of elements let when they are children to rule.</param>
+        /// <param name="patternVariables">Content of elements let when they are children to pattern.</param>>
         /// <param name="asserts">Content of elements assert.</param>
         /// <param name="reports">Content of elements report.</param>
-        public Rule(string context, IEnumerable<XElement> variables, IEnumerable<XElement> asserts, IEnumerable<XElement> reports)
+        public Rule(string context, IEnumerable<XElement> ruleVariables, IEnumerable<XElement> patternVariables, IEnumerable<XElement> asserts, IEnumerable<XElement> reports)
         {
             this.context = context;
-            ReadVariables(variables);
+            ReadVariables(ruleVariables);
+            ReadVariables(patternVariables);
             ReadAsserts(asserts);
             ReadReports(reports);
         }
@@ -96,7 +99,13 @@ namespace SchematronLib
             {
                 if (report != null)
                 {
-                    Reports.Add(new RuleContent { TestString = report.Attribute("test").Value, Message = report.Value });
+                    string testString = report.Attribute("test").Value;
+                    string message = util.GetTextContentWithElements(report);
+
+                    testString = ReplaceVariables(testString);
+                    message = ReplaceVariables(message);
+
+                    Reports.Add(new RuleContent { TestString = testString, Message = message });
                 }
             }
         }
