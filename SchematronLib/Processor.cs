@@ -77,8 +77,9 @@ namespace SchematronLib
                             string assertMessage = assert.Message;
 
                             assertMessage = HandleValueOf(assertMessage, element);
+                            Console.WriteLine(assertMessage);
 
-                            document.Messages.Add(assert.Message);
+                            document.Messages.Add(assertMessage);
                             document.Valid = false;
                         }
                     }
@@ -100,7 +101,7 @@ namespace SchematronLib
         {
             string newMessage = new string(message);
 
-            foreach (Match match in Regex.Matches(message, "[<][^>]+[>]")) // TODO: Det här regexet kommer plocka upp felaktiga taggar ex <abc>. Åtgärda
+            foreach (Match match in Regex.Matches(message, "<[^\\/>]+\\/>")) 
             {
                 string m = match.Value;
                 XElement valueOf = XElement.Parse(m);
