@@ -21,6 +21,7 @@ namespace SchematronLib
         private List<RuleContent> reports = new List<RuleContent>();
         //Private variable for storing datatype for handling Schematron variables
         private Variables variables = new Variables();
+        private Utilities util = new Utilities();
         public string Context
         {
             get { return context; }
@@ -80,7 +81,7 @@ namespace SchematronLib
                 if (assert != null)
                 {
                     string testString = assert.Attribute("test").Value;
-                    string message = assert.Value;
+                    string message = util.GetTextContentWithElements(assert);
 
                     testString = ReplaceVariables(testString);
                     message = ReplaceVariables(message);

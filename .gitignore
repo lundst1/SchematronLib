@@ -371,3 +371,4 @@ FodyWeavers.xsd
 /SchematronLibTests/XML/car_attribute.sch
 /SchematronLibTests/XML/car_attribute.xml
 /SchematronLibTests/XML/car_variable.sch
+/SchematronLibTests/XML/car_message.sch

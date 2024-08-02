@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -15,6 +16,7 @@ namespace SchematronLib
         private Document document;
         //Private variable for the Schematron file.
         private SchematronFile schematronFile;
+        private Utilities utils = new Utilities();
         /// <summary>
         /// Public property for variable xmlFile.
         /// Read access.
@@ -79,8 +81,10 @@ namespace SchematronLib
                         }
                         else
                         {
-                            Console.WriteLine(assert.Message);
+                            string assertMessage = assert.Message;
                             
+                            assertMessage = HandleValueOf(assertMessage, element);
+
                             document.Messages.Add(assert.Message);
                             document.Valid = false;
                         }
@@ -98,6 +102,29 @@ namespace SchematronLib
                     }
                 }
             } 
+        }
+        private string HandleValueOf(string message, XElement node)
+        {
+            string newMessage = new string(message);
+
+            foreach (Match match in Regex.Matches(message, "[<][^>]+[>]"))
+            {
+                string m = match.Value;
+                XElement valueOf = XElement.Parse(m);
+                string selectValue = valueOf.Attribute("select").Value;
+
+                if (selectValue != null)
+                {
+                    string result = node.Element(selectValue).Value;
+
+                    if (result != string.Empty)
+                    {
+                        newMessage = Regex.Replace(newMessage, m, result);
+                    }
+                }
+            }
+
+            return (newMessage);
         }
     }
 }

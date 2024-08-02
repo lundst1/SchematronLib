@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SchematronLib
 {
     /// <summary>
-    /// Class that handles methods that are used in several places.
+    /// Class that utility methods.
     /// </summary>
     internal class Utilities
     {
@@ -36,6 +37,27 @@ namespace SchematronLib
                 default:
                     return false;
             }
+        }
+        public string GetTextContentWithElements(XElement element)
+        {
+            return string.Join("", element.Nodes().Select(node =>
+            {
+                if (node is XText textNode)
+                {
+                    return textNode.Value;
+                }
+                else if (node is XElement elementNode)
+                { 
+                    var elementWithoutNamespace = new XElement(elementNode.Name.LocalName,
+                                                               elementNode.Attributes().Where(a => !a.IsNamespaceDeclaration),
+                                                               elementNode.Nodes());
+                    return elementWithoutNamespace.ToString(SaveOptions.DisableFormatting);
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }));
         }
     }
 }
