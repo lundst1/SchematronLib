@@ -49,54 +49,67 @@ namespace SchematronLib
         public void Process()
         {
             XDocument elements = document.Elements;
-            List<Rule> rules = schematronFile.RuleList;
-
+            //List<Rule> rules = schematronFile.RuleList;
+            List<Pattern> patternList = schematronFile.PatternList;
             document.Valid = true;
 
-            foreach (Rule rule in rules)
+            foreach(Pattern pattern in patternList)
             {
-                string context = rule.Context;
-                List<RuleContent> asserts = rule.Asserts;
-                List<RuleContent> reports = rule.Reports;
+                List<Rule> rules = pattern.RuleList;
 
-                IEnumerable<object> results = (IEnumerable<object>)System.Xml.XPath.Extensions.XPathEvaluate(elements, context);
-
-                foreach (XElement element in results)
+                foreach (Rule rule in rules)
                 {
-                    foreach (RuleContent assert in asserts)
+                    string context = rule.Context;
+                    List<RuleContent> asserts = rule.Asserts;
+                    List<RuleContent> reports = rule.Reports;
+
+                    IEnumerable<object> results = (IEnumerable<object>)System.Xml.XPath.Extensions.XPathEvaluate(elements, context);
+
+                    foreach (XElement element in results)
                     {
-                        Console.WriteLine(assert.TestString);
-                        bool assertValid = assert.Test(element);
-
-                        if (assertValid)
+                        foreach (RuleContent assert in asserts)
                         {
-                            Console.WriteLine("Assert successfull");
+                            Console.WriteLine(assert.TestString);
+                            bool assertValid = assert.Test(element);
+
+                            if (assertValid)
+                            {
+                                Console.WriteLine("Assert successfull");
+                            }
+                            else
+                            {
+                                string assertMessage = assert.Message;
+
+                                assertMessage = HandleValueOf(assertMessage, element);
+                                Console.WriteLine(assertMessage);
+
+                                document.Messages.Add(assertMessage);
+                                document.Valid = false;
+                            }
                         }
-                        else
+                        foreach (RuleContent report in reports)
                         {
-                            string assertMessage = assert.Message;
+                            bool reportResult = report.Test(element);
 
-                            assertMessage = HandleValueOf(assertMessage, element);
-                            Console.WriteLine(assertMessage);
+                            if (!reportResult)
+                            {
+                                Console.WriteLine(report.Message);
 
-                            document.Messages.Add(assertMessage);
-                            document.Valid = false;
-                        }
-                    }
-                    foreach (RuleContent report in reports)
-                    {
-                        bool reportResult = report.Test(element);
-
-                        if (!reportResult)
-                        {
-                            Console.WriteLine(report.Message);
-
-                            document.Messages.Add(report.Message);
+                                document.Messages.Add(report.Message);
+                            }
                         }
                     }
                 }
             }
         }
+        /// <summary>
+        /// Method that handles the tag value-of.
+        /// Extracts and parses the tag.
+        /// The contents of select is used to get some value from the XML document.
+        /// </summary>
+        /// <param name="message">The message that contains the tag</param>
+        /// <param name="node">The XML document with the content.</param>
+        /// <returns></returns>
         private string HandleValueOf(string message, XElement node)
         {
             string newMessage = new string(message);
