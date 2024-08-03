@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,11 +19,11 @@ namespace SchematronLib
         {
             get { return ruleList; }
         }
-        public Pattern(XElement pattern, XNamespace nameSpace) 
+        public Pattern(XElement pattern, Dictionary<string, string> diagnostics, XNamespace nameSpace) 
         {
-            Parse(pattern, nameSpace);
+            Parse(pattern, diagnostics, nameSpace);
         }
-        private void Parse(XElement pattern, XNamespace nameSpace)
+        private void Parse(XElement pattern, Dictionary<string, string> diagnostics, XNamespace nameSpace)
         {
             IEnumerable<XElement> patternVariables = from patternVariable in pattern.Elements(nameSpace + "let") select patternVariable;
             var ruleElements = from r in pattern.Elements(nameSpace + "rule") select r;
@@ -35,7 +36,7 @@ namespace SchematronLib
                 IEnumerable<XElement> asserts = from assert in r.Elements(nameSpace + "assert") select assert;
                 IEnumerable<XElement> reports = from report in r.Elements(nameSpace + "report") select report;
                 
-                Rule rule = new Rule(context, ruleVariables, patternVariables, asserts, reports);
+                Rule rule = new Rule(context, ruleVariables, patternVariables, asserts, reports, diagnostics);
                 ruleList.Add(rule);
             }
         }

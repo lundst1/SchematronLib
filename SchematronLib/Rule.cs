@@ -19,6 +19,7 @@ namespace SchematronLib
         private List<RuleContent> asserts = new List<RuleContent>();
         //Private list variable for reports.
         private List<RuleContent> reports = new List<RuleContent>();
+        private Dictionary<string, string> diagnostics;
         //Private variable for storing datatype for handling Schematron variables
         private Variables variables = new Variables();
         private Utilities util = new Utilities();
@@ -59,9 +60,10 @@ namespace SchematronLib
         /// <param name="patternVariables">Content of elements let when they are children to pattern.</param>>
         /// <param name="asserts">Content of elements assert.</param>
         /// <param name="reports">Content of elements report.</param>
-        public Rule(string context, IEnumerable<XElement> ruleVariables, IEnumerable<XElement> patternVariables, IEnumerable<XElement> asserts, IEnumerable<XElement> reports)
+        public Rule(string context, IEnumerable<XElement> ruleVariables, IEnumerable<XElement> patternVariables, IEnumerable<XElement> asserts, IEnumerable<XElement> reports, Dictionary<string, string> diagnostics)
         {
             this.context = context;
+            this.diagnostics = diagnostics;
             ReadVariables(ruleVariables);
             ReadVariables(patternVariables);
             ReadAsserts(asserts);
@@ -84,7 +86,18 @@ namespace SchematronLib
                 if (assert != null)
                 {
                     string testString = assert.Attribute("test").Value;
-                    string message = util.GetTextContentWithElements(assert);
+                    string message = string.Empty;
+                    
+                    if ((string)assert.Attribute("diagnostics") != null)
+                    {
+                        message = diagnostics[assert.Attribute("diagnostics").Value];
+                    }
+                    else
+                    {
+                        message = util.GetTextContentWithElements(assert);
+                    }
+                    
+                    
 
                     testString = ReplaceVariables(testString);
                     message = ReplaceVariables(message);
@@ -100,7 +113,17 @@ namespace SchematronLib
                 if (report != null)
                 {
                     string testString = report.Attribute("test").Value;
-                    string message = util.GetTextContentWithElements(report);
+                    string message = string.Empty;
+
+                    if ((string)report.Attribute("diagnostics") != null)
+                    {
+                        message = diagnostics[report.Attribute("diagnostics").Value];
+                    }
+                    else
+                    {
+                        message = util.GetTextContentWithElements(report);
+                    }
+
 
                     testString = ReplaceVariables(testString);
                     message = ReplaceVariables(message);
@@ -123,6 +146,5 @@ namespace SchematronLib
 
             return (newStringValue);
         }
-        
     }
 }
