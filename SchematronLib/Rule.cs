@@ -88,7 +88,7 @@ namespace SchematronLib
                     string testString = assert.Attribute("test").Value;
                     string message = string.Empty;
                     
-                    if ((string)assert.Attribute("diagnostics") != null)
+                    if ((string)assert.Attribute("diagnostics") != null) // TODO: i diagnostics-attributet kan det finnas flera referenser. Isf är de separerade med mellanslag. Lägg till stöd för detta
                     {
                         message = diagnostics[assert.Attribute("diagnostics").Value];
                     }

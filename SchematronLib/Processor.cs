@@ -7,11 +7,13 @@ namespace SchematronLib
     {
         //Private variable for XML file.
         private Document document;
+        //Private variable for the xml file stored as an instance of XDocument.
+        private XDocument elements;
         //Private variable for the Schematron file.
         private SchematronFile schematronFile;
         private Utilities utils = new Utilities();
         /// <summary>
-        /// Public property for variable xmlFile.
+        /// Public property the xml file.
         /// Read access.
         /// </summary>
         public Document Document
@@ -34,73 +36,109 @@ namespace SchematronLib
         public Processor(string document, string schematronFile)
         {
             this.document = new Document(document);
+            this.elements = this.document.Elements;
             this.schematronFile = new SchematronFile(schematronFile);
         }
         public Processor(Document document, SchematronFile schematronFile)
         {
             this.document = document;
+            this.elements = this.document.Elements;
             this.schematronFile = schematronFile;
         }
         public Processor(XDocument document, XDocument schematronFile)
         {
             this.document = new Document(document);
+            this.elements = this.document.Elements;
             this.schematronFile = new SchematronFile(schematronFile);
         }
+        /// <summary>
+        /// Method for processing the rules and the document.
+        /// Iterates through all patterns and calls method to process the rules in the pattern.
+        /// </summary>
         public void Process()
         {
-            XDocument elements = document.Elements;
-            //List<Rule> rules = schematronFile.RuleList;
-            List<Pattern> patternList = schematronFile.PatternList;
             document.Valid = true;
+            List<Pattern> patternList = schematronFile.PatternList;
 
-            foreach(Pattern pattern in patternList)
+            foreach (Pattern pattern in patternList)
             {
                 List<Rule> rules = pattern.RuleList;
+                Process(rules);
+            }
+        }
+        public void Process(List<string> phaseList)
+        {
+            document.Valid = true;
+            List<string> activePatterns = GetActivePatterns(phaseList);
+            List<Pattern> patternList = schematronFile.PatternList;
 
-                foreach (Rule rule in rules)
+
+            foreach (Pattern pattern in from i in patternList where activePatterns.Contains(i.Id) select i)
+            {
+                List<Rule> rules = pattern.RuleList;
+                Process(rules);
+            }
+
+        }
+        private void Process(List<Rule> rules)
+        { 
+
+            foreach (Rule rule in rules)
+            {
+                string context = rule.Context;
+                List<RuleContent> asserts = rule.Asserts;
+                List<RuleContent> reports = rule.Reports;
+
+                IEnumerable<object> results = (IEnumerable<object>)System.Xml.XPath.Extensions.XPathEvaluate(elements, context);
+
+                foreach (XElement element in results)
                 {
-                    string context = rule.Context;
-                    List<RuleContent> asserts = rule.Asserts;
-                    List<RuleContent> reports = rule.Reports;
-
-                    IEnumerable<object> results = (IEnumerable<object>)System.Xml.XPath.Extensions.XPathEvaluate(elements, context);
-
-                    foreach (XElement element in results)
+                    foreach (RuleContent assert in asserts)
                     {
-                        foreach (RuleContent assert in asserts)
+                        Console.WriteLine(assert.TestString);
+                        bool assertValid = assert.Test(element);
+
+                        if (assertValid)
                         {
-                            Console.WriteLine(assert.TestString);
-                            bool assertValid = assert.Test(element);
-
-                            if (assertValid)
-                            {
-                                Console.WriteLine("Assert successfull");
-                            }
-                            else
-                            {
-                                string assertMessage = assert.Message;
-
-                                assertMessage = HandleValueOf(assertMessage, element);
-                                Console.WriteLine(assertMessage);
-
-                                document.Messages.Add(assertMessage);
-                                document.Valid = false;
-                            }
+                            Console.WriteLine("Assert successfull");
+                            
                         }
-                        foreach (RuleContent report in reports)
+                        else
                         {
-                            bool reportResult = report.Test(element);
+                            string assertMessage = assert.Message;
 
-                            if (!reportResult)
-                            {
-                                Console.WriteLine(report.Message);
+                            assertMessage = HandleValueOf(assertMessage, element);
+                            Console.WriteLine(assertMessage);
 
-                                document.Messages.Add(report.Message);
-                            }
+                            document.Messages.Add(assertMessage);
+                            document.Valid = false;
+                        }
+                    }
+                    foreach (RuleContent report in reports)
+                    {
+                        bool reportResult = report.Test(element);
+
+                        if (!reportResult)
+                        {
+                            Console.WriteLine(report.Message);
+
+                            document.Messages.Add(report.Message);
                         }
                     }
                 }
             }
+        }
+        private List<string> GetActivePatterns(List<string> phaseList)
+        {
+            List<string> activePatterns = new List<string>();
+            
+            foreach(string phaseId in phaseList)
+            {
+                Phase phase = schematronFile.Phases[phaseId];
+                activePatterns.AddRange(phase.ActivePatterns);
+            }
+
+            return activePatterns;
         }
         /// <summary>
         /// Method that handles the tag value-of.

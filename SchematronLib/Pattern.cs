@@ -10,7 +10,28 @@ namespace SchematronLib
 {
     public class Pattern
     {
+        //Private variable for the id of the pattern.
+        private string? id;
+        //Private variable for if the pattern is active. Default is true and can be changed by the element phase.
+        private bool active = true;
         private List<Rule> ruleList = new List<Rule>();
+        /// <summary>
+        /// Public property for variable id.
+        /// Read access.
+        /// </summary>
+        public string Id
+        {
+            get { return id; }
+        }
+        /// <summary>
+        /// Public property for the variable active.
+        /// Both read and write access.
+        /// </summary>
+        public bool Active
+        {
+            get { return active; }
+            set { active = value; }
+        }
         /// <summary>
         /// Property to access variable ruleList.
         /// Read access. 
@@ -19,8 +40,14 @@ namespace SchematronLib
         {
             get { return ruleList; }
         }
+        
         public Pattern(XElement pattern, Dictionary<string, string> diagnostics, XNamespace nameSpace) 
         {
+            if ((string)pattern.Attribute("id") != null)
+            {
+                this.id = pattern.Attribute("id").Value;
+            }
+            
             Parse(pattern, diagnostics, nameSpace);
         }
         private void Parse(XElement pattern, Dictionary<string, string> diagnostics, XNamespace nameSpace)
