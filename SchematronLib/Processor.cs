@@ -72,7 +72,6 @@ namespace SchematronLib
             List<string> activePatterns = GetActivePatterns(phaseList);
             List<Pattern> patternList = schematronFile.PatternList;
 
-
             foreach (Pattern pattern in from i in patternList where activePatterns.Contains(i.Id) select i)
             {
                 List<Rule> rules = pattern.RuleList;

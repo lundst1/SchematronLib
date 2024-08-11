@@ -375,3 +375,4 @@ FodyWeavers.xsd
 /SchematronLibTests/XML/car_diagnostics.sch
 /SchematronLibTests/XML/car - Copy.sch
 /SchematronLibTests/XML/car_phases.sch
+/SchematronLibTests/XML/car_abstract_rule.sch
