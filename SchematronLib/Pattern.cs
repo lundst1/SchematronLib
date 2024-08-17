@@ -15,6 +15,10 @@ namespace SchematronLib
         //Private variable for if the pattern is active. Default is true and can be changed by the element phase.
         private bool active = true;
         private List<Rule> ruleList = new List<Rule>();
+        //Private variable for asserts.
+        private IEnumerable<XElement> asserts;
+        //Private variable for reports.
+        private IEnumerable<XElement> reports;
         /// <summary>
         /// Public property for the if of the pattern.
         /// Read access.
@@ -71,45 +75,72 @@ namespace SchematronLib
             {
                 string context = r.Attribute("context").Value.ToString();
 
+                asserts = from assert in r.Elements(nameSpace + "assert") select assert;
+                reports = from report in r.Elements(nameSpace + "report") select report;
+
                 IEnumerable<XElement> ruleVariables = from ruleVariable in r.Elements(nameSpace + "let") select ruleVariable;
-                IEnumerable<XElement> asserts = from assert in r.Elements(nameSpace + "assert") select assert;
-                IEnumerable<XElement> reports = from report in r.Elements(nameSpace + "report") select report;
-                IEnumerable<XElement> extends = from extendsElem in r.Elements(nameSpace + "extends") select extendsElem;
-                
+                IEnumerable<XElement> extends = from extendsElem in r.Elements(nameSpace + "extends").Where(e => e.Attribute("rule") != null) select extendsElem;
+                IEnumerable<XElement> extendsHref = from extendsElem in r.Elements(nameSpace + "extends").Where(e => e.Attribute("href") != null) select extendsElem;
+
                 if (extends.Any())
                 {
-                    var abstractRules = HandleAbstractRules(extends, pattern, nameSpace);
-                    IEnumerable<XElement> extendedAsserts = abstractRules.Item1;
-                    IEnumerable<XElement> extendedReports = abstractRules.Item2;
-
-                    asserts = asserts.Concat(extendedAsserts);
-                    reports = reports.Concat(extendedReports);
+                    HandleAbstractRules(extends, pattern, nameSpace);   
+                }
+                if (extendsHref.Any())
+                {
+                    HandleAbstractRules(extendsHref, nameSpace);
                 }
 
                 Rule rule = new Rule(context, ruleVariables, patternVariables, asserts, reports, diagnostics);
                 ruleList.Add(rule);
             }
         }
-        private (IEnumerable<XElement>, IEnumerable<XElement>) HandleAbstractRules(IEnumerable<XElement> extends, XElement pattern, XNamespace nameSpace)
+
+        /// <summary>
+        /// Method for handling abstract rules.
+        /// Queries the pattern after pattern after abstract rules with ids that match the extend elements id.
+        /// </summary>
+        /// <param name="extends">Elements with name extends that are found in an element rule.</param>
+        /// <param name="pattern">XElement representation of the node pattern.</param>
+        /// <param name="nameSpace">The namespace of the Schematron file</param>
+        /// <returns>Returns a tuple containing extended asserts and extended reports.</returns>
+        private void HandleAbstractRules(IEnumerable<XElement> extends, XElement pattern, XNamespace nameSpace)
         {
             IEnumerable<XElement> extendedAsserts = null;
             IEnumerable<XElement> extendedReports = null;
 
             foreach (XElement extendsElem in extends)
             {
-                string id = extendsElem.Attribute("id").Value;
+                string id = extendsElem.Attribute("rule").Value;
 
                 IEnumerable<XElement> extendedRules = from extendedRule in pattern.Elements(nameSpace + "rule") where extendedRule.Attribute("abstract")?.Value == "true" && extendedRule.Attribute("id")?.Value == id select extendedRule;
 
                 foreach (XElement extendedRule in extendedRules)
                 {
-                    Console.WriteLine(extendedRule.Attribute("abstract").Value); ;
                     extendedAsserts = from assert in extendedRule.Elements(nameSpace + "assert") select assert;
                     extendedReports = from report in extendedRule.Elements(nameSpace + "report") select report;
                 }
             }
-            
-            return (extendedAsserts, extendedReports);
+
+            asserts = asserts.Concat(extendedAsserts);
+            reports = reports.Concat(extendedReports);
+        }
+        private void HandleAbstractRules(IEnumerable<XElement> extends, XNamespace nameSpace)
+        {
+            IEnumerable<XElement> extendedAsserts = null;
+            IEnumerable<XElement> extendedReports = null;
+
+            foreach(XElement extendsElem in extends)
+            {
+                string href = extendsElem.Attribute("href").Value;
+                XDocument extendedDoc = XDocument.Load(href);
+
+                extendedAsserts = from extendedAssert in extendedDoc.Root.Elements(nameSpace + "assert") select extendedAssert;
+                extendedReports = from extendedReport in extendedDoc.Root.Elements(nameSpace + "report") select extendedReport;
+            }
+
+            asserts = asserts.Concat(extendedAsserts);
+            reports = reports.Concat(extendedReports);
         }
     }
 }

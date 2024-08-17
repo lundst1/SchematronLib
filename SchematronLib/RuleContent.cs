@@ -23,8 +23,6 @@ namespace SchematronLib
 
             var value = System.Xml.XPath.Extensions.XPathEvaluate(node, TestString);
 
-            
-
             if (utils.XpathResultIsEmpty(value))
             {
                 result = false; 

@@ -376,3 +376,6 @@ FodyWeavers.xsd
 /SchematronLibTests/XML/car - Copy.sch
 /SchematronLibTests/XML/car_phases.sch
 /SchematronLibTests/XML/car_abstract_rule.sch
+/SchematronLibTests/XML/ext_schema.sch
+/SchematronLibTests/XML/car_abstract_rule_external.sch
+/SchematronLibTests/XML/car_fail_regnumber.xml
