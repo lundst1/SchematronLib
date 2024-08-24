@@ -379,3 +379,5 @@ FodyWeavers.xsd
 /SchematronLibTests/XML/ext_schema.sch
 /SchematronLibTests/XML/car_abstract_rule_external.sch
 /SchematronLibTests/XML/car_fail_regnumber.xml
+/SchematronLibTests/XML/car_attribute - Copy.sch
+/SchematronLibTests/XML/car_abstract_pattern.sch
