@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 
 namespace SchematronLib
 {
@@ -44,7 +45,8 @@ namespace SchematronLib
         private void Parse()
         {
             patterns = from pattern in Elements.Root.Elements(NameSpace + "pattern").Where(e => e.Attribute("is-a") == null && e.Attribute("abstract") == null) select pattern; //Todo: Lägg till where sats som avgränsar till icke-abstrakta patterns.
-            
+
+            IncludeOtherSchemas();
             GetAbstractPatterns();
             ResolveAbstractPatterns();
             ParsePhases();
@@ -145,7 +147,10 @@ namespace SchematronLib
         private void ParseDiagnostics()
         {
             IEnumerable<XElement> diagnosticElements = from diagnosticElement in Elements.Root.Elements(NameSpace + "diagnostics").Elements(NameSpace + "diagnostic") select diagnosticElement;
-
+            ParseDiagnostics(diagnosticElements);
+        }
+        private void ParseDiagnostics(IEnumerable<XElement> diagnosticElements)
+        {
             foreach (XElement diagnosticElement in diagnosticElements)
             {
                 string id = diagnosticElement.Attribute("id").Value;
@@ -154,6 +159,66 @@ namespace SchematronLib
                 diagnostics[id] = message;
             }
         }
+        private void IncludeOtherSchemas()
+        {
+            IEnumerable<XElement> includedSchemas = from includedSchema in Elements.Root.Elements(NameSpace + "include") select includedSchema;
 
+            foreach (XElement includedSchemaElement in includedSchemas)
+            {
+                string href = includedSchemaElement.Attribute("href").Value;
+                XDocument includedSchema = XDocument.Load(href);
+                string root = includedSchema.Root.Name.LocalName;
+
+                if (root == "schema")
+                {
+                    AddSchema(includedSchema);
+                }
+                if (root == "diagnostics")
+                {
+                    AddDiagnostics(includedSchema);
+                }
+                if (root == "pattern")
+                {
+                    AddPattern(includedSchema);
+                }
+            }
+        }
+        private void AddSchema(XDocument schema)
+        {
+            XElement diagnosticElements = schema.Root.Element(NameSpace + "diagnostics");
+            IEnumerable<XElement> patternElements = from patternElement in schema.Root.Elements(NameSpace + "pattern") select patternElement;
+
+            if (diagnosticElements != null)
+            {
+                AddDiagnostics(diagnosticElements);
+            }
+            
+            AddPattern(patternElements);
+        }
+        private void AddDiagnostics(XElement diagnostics)
+        {
+            AddDiagnostics(new XDocument(diagnostics));
+        }
+        private void AddDiagnostics(XDocument diagnostics)
+        {
+            IEnumerable<XElement> diagnosticElems = from diagnosticElem in diagnostics.Root?.Elements(NameSpace + "diagnostic") select diagnosticElem;
+            ParseDiagnostics(diagnosticElems);
+        }
+        private void AddPattern(IEnumerable<XElement> patterns)
+        {
+            foreach(XElement pattern in patterns)
+            {
+                AddPattern(new XDocument(pattern));
+            }
+        }
+        private void AddPattern(XDocument pattern)
+        {
+            IEnumerable<XElement> patternElems = from p in pattern.Elements() select p;
+            
+            if (patternElems != null)
+            {
+                patterns = patterns.Concat(patternElems);
+            }
+        }
     }
 }

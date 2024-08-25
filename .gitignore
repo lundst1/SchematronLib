@@ -381,3 +381,7 @@ FodyWeavers.xsd
 /SchematronLibTests/XML/car_fail_regnumber.xml
 /SchematronLibTests/XML/car_attribute - Copy.sch
 /SchematronLibTests/XML/car_abstract_pattern.sch
+/SchematronLibTests/XML/car_include.sch
+/SchematronLibTests/XML/car_include_diagnostics.sch
+/SchematronLibTests/XML/car_diagnostics_2.sch
+/SchematronLibTests/XML/car_diagnostics.sch
