@@ -11,9 +11,6 @@ namespace SchematronLib
     /// <summary>
     /// Class that handles specific logic regarding variables. 
     /// </summary>
-    
-    // TODO: Lägg till stöd för att hantera intern xml i variabler
-
     public class Variables
     {
         private Dictionary<string, string> variables = new Dictionary<string, string>();

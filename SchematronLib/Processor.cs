@@ -31,7 +31,7 @@ namespace SchematronLib
         /// <summary>
         /// Constructor for processor class.
         /// </summary>
-        /// <param name="xmlFile">Path to the XML file.</param>
+        /// <param name="document">Path to the XML file.</param>
         /// <param name="schematronFile">Path to the Schematron file.</param>
         public Processor(string document, string schematronFile)
         {
@@ -39,12 +39,22 @@ namespace SchematronLib
             this.elements = this.document.Elements;
             this.schematronFile = new SchematronFile(schematronFile);
         }
+        /// <summary>
+        /// Constructor for processor class.
+        /// </summary>
+        /// <param name="document">XML-file to be validated as an instance class Document.</param>
+        /// <param name="schematronFile">The schematron schema as an instance of class SchematronFile.</param>
         public Processor(Document document, SchematronFile schematronFile)
         {
             this.document = document;
             this.elements = this.document.Elements;
             this.schematronFile = schematronFile;
         }
+        /// <summary>
+        /// Constructor for processor class.
+        /// </summary>
+        /// <param name="document">XML-file to be validated as an instance class XDocument</param>
+        /// <param name="schematronFile">The schematron schema as an instance of class XDocument.</param>
         public Processor(XDocument document, XDocument schematronFile)
         {
             this.document = new Document(document);
@@ -66,6 +76,11 @@ namespace SchematronLib
                 Process(rules);
             }
         }
+        /// <summary>
+        /// Method for processing the rules and the document.
+        /// Iterates through all patterns who are active and calls method to process the rules in the pattern.
+        /// </summary>
+        /// <param name="phaseList">List of phases that are used.</param>
         public void Process(List<string> phaseList)
         {
             document.Valid = true;
@@ -94,37 +109,44 @@ namespace SchematronLib
                 {
                     foreach (RuleContent assert in asserts)
                     {
-                        Console.WriteLine(assert.TestString);
-                        bool assertValid = assert.Test(element);
-
-                        if (assertValid)
-                        {
-                            Console.WriteLine("Assert successfull");
-                            
-                        }
-                        else
-                        {
-                            string assertMessage = assert.Message;
-
-                            assertMessage = HandleValueOf(assertMessage, element);
-                            Console.WriteLine(assertMessage);
-
-                            document.Messages.Add(assertMessage);
-                            document.Valid = false;
-                        }
+                        ProcessAsserts(assert, element);
                     }
                     foreach (RuleContent report in reports)
                     {
-                        bool reportResult = report.Test(element);
-
-                        if (!reportResult)
-                        {
-                            Console.WriteLine(report.Message);
-
-                            document.Messages.Add(report.Message);
-                        }
+                        ProcessReports(report, element);
                     }
                 }
+            }
+        }
+        private void ProcessAsserts(RuleContent assert, XElement element)
+        {
+            Console.WriteLine(assert.TestString);
+            bool assertValid = assert.Test(element);
+
+            if (assertValid)
+            {
+                Console.WriteLine("Assert successfull");
+            }
+            else
+            {
+                string assertMessage = assert.Message;
+
+                assertMessage = HandleValueOf(assertMessage, element);
+                Console.WriteLine(assertMessage);
+
+                document.Messages.Add(assertMessage);
+                document.Valid = false;
+            }
+        }
+        private void ProcessReports(RuleContent report, XElement element)
+        {
+            bool reportResult = report.Test(element);
+
+            if (!reportResult)
+            {
+                Console.WriteLine(report.Message);
+
+                document.Messages.Add(report.Message);
             }
         }
         private List<string> GetActivePatterns(List<string> phaseList)

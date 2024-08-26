@@ -102,7 +102,7 @@ namespace SchematronLib
         /// </summary>
         /// <param name="extends">Elements with name extends that are found in an element rule.</param>
         /// <param name="pattern">XElement representation of the node pattern.</param>
-        /// <param name="nameSpace">The namespace of the Schematron file</param>
+        /// <param name="nameSpace">The namespace of the Schematron file.</param>
         /// <returns>Returns a tuple containing extended asserts and extended reports.</returns>
         private void HandleAbstractRules(IEnumerable<XElement> extends, XElement pattern, XNamespace nameSpace)
         {
@@ -125,6 +125,12 @@ namespace SchematronLib
             asserts = asserts.Concat(extendedAsserts);
             reports = reports.Concat(extendedReports);
         }
+        /// <summary>
+        /// Method for handling abstract rules.
+        /// Queries the pattern after pattern after abstract rules with ids that match the extend elements id.
+        /// </summary>
+        /// <param name="extends">Elements with name extends that are found in an element rule.</param>
+        /// <param name="nameSpace">The namespace of the Schematron file.</param>
         private void HandleAbstractRules(IEnumerable<XElement> extends, XNamespace nameSpace)
         {
             IEnumerable<XElement> extendedAsserts = null;

@@ -16,14 +16,26 @@ namespace SchematronLib
         private bool? valid;
 
         private List<string> messages = new List<string>();
+        /// <summary>
+        /// Public property for if XML file is valid according to some schema.
+        /// Both read and write access. 
+        /// </summary>
         public bool? Valid
         {
             get { return valid; }
             set { valid = value; }
         }
-        public Document(string filename) : base(filename) { }  
+        /// <summary>
+        /// Constructor for class Document.
+        /// </summary>
+        /// <param name="filename">The path of the file.</param>
+        public Document(string filename) : base(filename) { }
+        /// <summary>
+        /// Constructor for class Document.
+        /// </summary>
+        /// <param name="document">An instance of class XDocument.</param>
         public Document(XDocument document) : base(document) { }
-    
+        
         public List<string> Messages
         {
             get { return messages; }

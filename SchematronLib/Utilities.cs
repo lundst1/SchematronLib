@@ -38,6 +38,11 @@ namespace SchematronLib
                     return false;
             }
         }
+        /// <summary>
+        /// Method to return content of an element, when the content contains XML-like formatting.
+        /// </summary>
+        /// <param name="element">The element with the content.</param>
+        /// <returns>Returns the content of the element as text regardless of content.</returns>
         public string GetTextContentWithElements(XElement element)
         {
             return string.Join("", element.Nodes().Select(node =>
