@@ -31,35 +31,84 @@ namespace SchematronLib
         /// <summary>
         /// Constructor for processor class.
         /// </summary>
-        /// <param name="document">Path to the XML file.</param>
         /// <param name="schematronFile">Path to the Schematron file.</param>
-        public Processor(string document, string schematronFile)
+        public Processor(string schematronFile)
         {
-            this.document = new Document(document);
-            this.elements = this.document.Elements;
             this.schematronFile = new SchematronFile(schematronFile);
         }
         /// <summary>
         /// Constructor for processor class.
         /// </summary>
-        /// <param name="document">XML-file to be validated as an instance class Document.</param>
         /// <param name="schematronFile">The schematron schema as an instance of class SchematronFile.</param>
         public Processor(Document document, SchematronFile schematronFile)
         {
-            this.document = document;
-            this.elements = this.document.Elements;
+            
             this.schematronFile = schematronFile;
         }
         /// <summary>
         /// Constructor for processor class.
         /// </summary>
-        /// <param name="document">XML-file to be validated as an instance class XDocument</param>
         /// <param name="schematronFile">The schematron schema as an instance of class XDocument.</param>
-        public Processor(XDocument document, XDocument schematronFile)
+        public Processor(XDocument schematronFile)
+        {
+            this.schematronFile = new SchematronFile(schematronFile);
+        }
+        /// <summary>
+        /// Method to process a document.
+        /// </summary>
+        /// <param name="document">A URI to a document.</param>
+        public void Process(string document)
         {
             this.document = new Document(document);
-            this.elements = this.document.Elements;
-            this.schematronFile = new SchematronFile(schematronFile);
+            Process();
+        }
+        /// <summary>
+        /// Method to process a document.
+        /// </summary>
+        /// <param name="document">Document to be processed as an instance of SchematronLib.Document.</param>
+        public void Process(Document document) 
+        {
+            this.document = document;
+            Process();
+        }
+        /// <summary>
+        /// Method to process a document.
+        /// </summary>
+        /// <param name="document">Document to be processed as an instance of XDocument.</param>
+        public void Process(XDocument document) 
+        {
+            this.document = new Document(document);
+            Process();
+        }
+        /// <summary>
+        /// Method to process a document.
+        /// </summary>
+        /// <param name="document">A URI to a document.</param>
+        /// <param name="phaseList">List of phases that are used.</param>
+        public void Process(string document, List<string> phaseList)
+        {
+            this.document = new Document(document);
+            Process(phaseList);
+        }
+        /// <summary>
+        /// Method to process a document.
+        /// </summary>
+        /// <param name="document">Document to be processed as an instance of SchematronLib.Document.</param>
+        /// <param name="phaseList">List of phases that are used.</param>
+        public void Process(Document document, List<string> phaseList)
+        {
+            this.document = document;
+            Process(phaseList);
+        }
+        /// <summary>
+        /// Method to process a document.
+        /// </summary>
+        /// <param name="document">Document to be processed as an instance of XDocument..</param>
+        /// <param name="phaseList">List of phases that are used.</param>
+        public void Process(XDocument document, List<string> phaseList)
+        {
+            this.document = new Document(document);
+            Process(phaseList);
         }
         /// <summary>
         /// Method for processing the rules and the document.
@@ -67,6 +116,7 @@ namespace SchematronLib
         /// </summary>
         public void Process()
         {
+            this.elements = this.document.Elements;
             document.Valid = true;
             List<Pattern> patternList = schematronFile.PatternList;
 
@@ -83,6 +133,7 @@ namespace SchematronLib
         /// <param name="phaseList">List of phases that are used.</param>
         public void Process(List<string> phaseList)
         {
+            this.elements = this.document.Elements;
             document.Valid = true;
             List<string> activePatterns = GetActivePatterns(phaseList);
             List<Pattern> patternList = schematronFile.PatternList;
